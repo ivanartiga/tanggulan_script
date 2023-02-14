@@ -2,6 +2,15 @@
 from keras.models import Sequential, Model,model_from_json
 from keras.layers import Input, Dense, Dropout, Flatten
 from keras.layers.convolutional import Conv3D, MaxPooling3D, ZeroPadding3D
+# Import Ipython
+from IPython import get_ipython
+
+
+def get_weights():
+    # downloads C3D weights from https://github.com/aslucki/C3D_Sport1M_keras
+    # Transfer Learning Approach
+    get_ipython().system('mkdir weights')
+    get_ipython().system('gdown --id 1rlZ-xTkTMjgWKiQFUedRnHlDgQwx6yTm -O weights/weights.h5')
 
 
 def create_C3D_model(summary=False):
