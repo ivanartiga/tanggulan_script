@@ -1,9 +1,13 @@
 # C3D definition
-from keras.models import Sequential, Model,model_from_json
+from keras.models import Sequential, Model
 from keras.layers import Input, Dense, Dropout, Flatten
 from keras.layers.convolutional import Conv3D, MaxPooling3D, ZeroPadding3D
 # Import Ipython
 from IPython import get_ipython
+# Saving Model
+from keras.models import load_model
+# Import multiprocessing module
+import multiprocessing
 
 
 def get_weights():
@@ -29,7 +33,7 @@ def create_C3D_model(summary=False):
 
     model = Sequential()
     input_shape = (16, 112, 112, 3)
-
+    # 1st layer group
     model.add(Conv3D(64, (3, 3, 3), activation='relu',
                      padding='same', name='conv1',
                      input_shape=input_shape))
@@ -75,7 +79,7 @@ def create_C3D_model(summary=False):
 
     return model
 
-def getFeatureExtractor(weigthsPath, layer, verbose = False):
+def getFeatureExtractor(weigthsPath, modelPath, layer, verbose = False):
     """Gets the C3D feature extractor
 
     Parameters
@@ -95,8 +99,16 @@ def getFeatureExtractor(weigthsPath, layer, verbose = False):
 
     """
 
-    model = create_C3D_model(verbose)
+    model = load_model(modelPath)
     model.load_weights(weigthsPath)
-    model.compile(loss='mean_squared_error', optimizer='sgd')
-
     return Model(inputs=model.input,outputs=model.get_layer(layer).output)
+
+def predict(model,value):
+    result = model.predict(value)
+    return result
+
+# Create Model into .h5 format
+# model = create_C3D_model(True)
+# model.load_weights("weights/weights.h5")
+# model.compile(loss='mean_squared_error', optimizer='sgd')
+# model.save('feature_extractor.h5',True,True)
