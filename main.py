@@ -1,14 +1,49 @@
 import time
+import logging
+
+"""Flask Modules for API"""
+import flask
+from flask import Flask, jsonify, request
+"""Deep Learning Modules"""
 import cv2
 import numpy as np
 from keras.models import Model
-from c3d_feature_extractor import getFeatureExtractor, predict
+from c3d_feature_extractor import getFeatureExtractor
 import multiprocessing
+
+def init_model():
+    try:
+        feature_extractor = getFeatureExtractor("weights/weights.h5", "feature_extractor.h5", "fc6", False)
+        logging.info("Feature Extraction Model Loaded")
+        return feature_extractor
+    except Exception as e:
+        logging.error(f"Error Loading Feature Extraction Model Message:" +e.value)
+        return None
+def preprocess_frames(frames):
+    for frame in frames:
+        cv2.resize(frame, (112, 112))
+    return frames
+def camera_fps(capture):
+    return int(capture.get(cv2.CAP_PROP_FPS))
+
+"""Initiate Flask API"""
+app = Flask(__name__)
+
+@app.route('/predict', methods=['GET'])
+def predict(feature_extractor,frames):
+    return jsonify(result="Violence Detected")
+    pass
+
+@app.route('/', methods=['GET'])
+def test():
+    return jsonify(message="Hello World")
+
+
 def main():
     print("Initializing Camera...")
     capture = cv2.VideoCapture(0)
-    fps = int(capture.get(cv2.CAP_PROP_FPS))
-    print(f"Frames per second: {fps}")
+    #fps = int(capture.get(cv2.CAP_PROP_FPS))
+    #print(f"Frames per second: {fps}")
     chunks = []
     frame_count = 0
     print("Loading feature extractor model...")
@@ -36,4 +71,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True, host='0.0.0.0')
+    #main()
